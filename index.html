@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HCAF | Transparan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: black;
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            overflow-x: hidden;
+            cursor: none;
+        }
+        #spaceCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .content {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        .room {
+            display: none;
+            width: 100%;
+            max-width: 800px;
+            animation: fade 0.3s;
+        }
+        .room.active {
+            display: block;
+        }
+        @keyframes fade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        /* Kotak transparan, tanpa blur, alpha 0.6 */
+        .hcaf-box {
+            background: rgba(20, 20, 30, 0.6);
+            border: 2px solid #ffaa00;
+            border-radius: 32px;
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.7);
+            padding: 2rem 1.5rem;
+            backdrop-filter: none;
+        }
+        .btn-wa {
+            border: 2px solid #ffaa00;
+            color: #ffaa00;
+            background: transparent;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 2px;
+            padding: 1.2rem 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+        }
+        .btn-wa:hover {
+            background: #ffaa00;
+            color: black;
+            box-shadow: 0 10px 25px rgba(255, 170, 0, 0.5);
+            transform: scale(1.02);
+        }
+        .header-icon {
+            width: 80px;
+            height: 80px;
+            background: #000080;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            border: 3px solid #b8860b;
+            font-size: 3rem;
+        }
+        /* Semua teks kuning */
+        h1, h2, p, .gold-subtitle, .glow-text, .pendiri-label, footer p {
+            color: #ffaa00 !important;
+        }
+        .gold-subtitle {
+            text-shadow: 0 0 10px rgba(255, 170, 0, 0.5);
+        }
+        .glow-text {
+            text-shadow: 0 2px 5px rgba(255, 170, 0, 0.5);
+        }
+        .pendiri-item {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #ffaa00;
+            border-radius: 20px;
+            padding: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        .pendiri-label {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        .pendiri-box {
+            background: #ffaa00;
+            border-radius: 16px;
+            padding: 0.6rem 1.8rem;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: black;
+            box-shadow: 0 0 15px #ffaa00;
+        }
+        .custom-cursor {
+            width: 30px;
+            height: 30px;
+            border: 2px solid #ffaa00;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            box-shadow: 0 0 20px #ffaa00;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+        }
+        .custom-cursor::after {
+            content: "⭐";
+            font-size: 20px;
+            color: #ffaa00;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="spaceCanvas"></canvas>
+    <div class="custom-cursor" id="customCursor"></div>
+
+    <div class="content">
+        <!-- MAIN MENU -->
+        <div id="main-menu" class="room active">
+            <div class="hcaf-box">
+                <div class="text-center mb-8">
+                    <div class="header-icon">🪐</div>
+                    <h1 class="text-5xl font-black glow-text">HCAF</h1>
+                    <p class="gold-subtitle text-lg mt-1 italic">✦ HISTORY LOVER ASTRONOMI FREDOM ✦</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <a href="#" class="btn-wa" onclick="openRoom('room-pendiri'); return false;">
+                        <span class="text-2xl">👤</span>PENDIRI
+                    </a>
+                    <a href="#" class="btn-wa" onclick="openRoom('room-vm'); return false;">
+                        <span class="text-2xl">🎯</span>VISI & MISI
+                    </a>
+                    <a href="#" class="btn-wa" onclick="openRoom('room-tentang'); return false;">
+                        <span class="text-2xl">ℹ️</span>TENTANG
+                    </a>
+                    <a href="#" class="btn-wa" onclick="openRoom('room-status'); return false;">
+                        <span class="text-2xl">📊</span>STATUS MARGA
+                    </a>
+                    <a href="#" class="btn-wa col-span-2" onclick="openRoom('room-musuh'); return false;">
+                        <span class="text-2xl">👾</span>MUSUH
+                    </a>
+                </div>
+                <div class="text-center mt-8 text-xs border-t border-[#ffaa00]/30 pt-4">
+                    <p>© 2026 HCAF COMMUNITY</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROOM PENDIRI -->
+        <div id="room-pendiri" class="room">
+            <div class="hcaf-box">
+                <h2 class="text-3xl font-bold text-center mb-6">PENDIRI HCAF</h2>
+                <div class="pendiri-item">
+                    <span class="pendiri-label">PRESIDENT</span>
+                    <div class="pendiri-box">VIAN</div>
+                </div>
+                <div class="pendiri-item">
+                    <span class="pendiri-label">VICE</span>
+                    <div class="pendiri-box">SYLPHIE</div>
+                </div>
+                <div class="pendiri-item">
+                    <span class="pendiri-label">SUPERVISORY COUNCIL</span>
+                    <div class="pendiri-box">CIEL</div>
+                </div>
+                <div class="text-center mt-6">
+                    <a href="#" class="btn-wa inline-block px-6 py-2 text-sm" onclick="openRoom('main-menu'); return false;">KEMBALI</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROOM LAIN (placeholder) -->
+        <div id="room-vm" class="room">
+            <div class="hcaf-box">
+                <h2 class="text-3xl font-bold text-center mb-6">VISI & MISI</h2>
+                <p class="text-center">Konten visi misi akan segera hadir.</p>
+                <div class="text-center mt-6"><a href="#" class="btn-wa inline-block px-6 py-2 text-sm" onclick="openRoom('main-menu'); return false;">KEMBALI</a></div>
+            </div>
+        </div>
+        <div id="room-tentang" class="room">
+            <div class="hcaf-box">
+                <h2 class="text-3xl font-bold text-center mb-6">TENTANG</h2>
+                <p class="text-center">Informasi tentang HCAF.</p>
+                <div class="text-center mt-6"><a href="#" class="btn-wa inline-block px-6 py-2 text-sm" onclick="openRoom('main-menu'); return false;">KEMBALI</a></div>
+            </div>
+        </div>
+        <div id="room-status" class="room">
+            <div class="hcaf-box">
+                <h2 class="text-3xl font-bold text-center mb-6">STATUS MARGA</h2>
+                <p class="text-center">Data status marga.</p>
+                <div class="text-center mt-6"><a href="#" class="btn-wa inline-block px-6 py-2 text-sm" onclick="openRoom('main-menu'); return false;">KEMBALI</a></div>
+            </div>
+        </div>
+        <div id="room-musuh" class="room">
+            <div class="hcaf-box">
+                <h2 class="text-3xl font-bold text-center mb-6">MUSUH</h2>
+                <p class="text-center">Daftar musuh HCAF.</p>
+                <div class="text-center mt-6"><a href="#" class="btn-wa inline-block px-6 py-2 text-sm" onclick="openRoom('main-menu'); return false;">KEMBALI</a></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openRoom(roomId) {
+            document.querySelectorAll('.room').forEach(r => r.classList.remove('active'));
+            document.getElementById(roomId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        // Canvas latar (planet & bintang)
+        const canvas = document.getElementById('spaceCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let planets = [];
+        let stars = [];
+
+        function initCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+
+            // Bintang
+            stars = [];
+            for (let i = 0; i < 200; i++) {
+                stars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    size: Math.random() * 2 + 1,
+                    speed: (Math.random() - 0.5) * 0.2,
+                });
+            }
+
+            // Planet dengan kecepatan sama (0.001)
+            const planetData = [
+                { name: 'Merkurius', radius: 28, dist: 120, color: '#b0b0b0', angle: 0 },
+                { name: 'Venus',    radius: 32, dist: 160, color: '#f0d8b0', angle: 1 },
+                { name: 'Bumi',     radius: 34, dist: 200, color: '#3a75c4', angle: 2 },
+                { name: 'Mars',     radius: 30, dist: 240, color: '#c45a4a', angle: 3 },
+                { name: 'Jupiter',  radius: 50, dist: 300, color: '#d2a679', angle: 4 },
+                { name: 'Saturnus', radius: 46, dist: 360, color: '#e3b37c', angle: 5 },
+                { name: 'Uranus',   radius: 40, dist: 420, color: '#7ec8e0', angle: 6 },
+                { name: 'Neptunus', radius: 40, dist: 480, color: '#4a7db5', angle: 7 }
+            ];
+            planets = planetData.map(p => ({
+                ...p,
+                centerX: width / 2,
+                centerY: height / 2 - 20,
+                speed: 0.001 // semua sama
+            }));
+        }
+
+        function drawPlanet(x, y, radius, color) {
+            // Gradasi halus tanpa outline
+            const grad = ctx.createRadialGradient(x-5, y-5, radius*0.2, x, y, radius*1.1);
+            grad.addColorStop(0, color);
+            grad.addColorStop(0.7, '#555');
+            grad.addColorStop(1, '#222');
+
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI*2);
+            ctx.fillStyle = grad;
+            ctx.shadowBlur = 0;
+            ctx.fill();
+
+            // Highlight kecil
+            ctx.beginPath();
+            ctx.arc(x-4, y-4, radius*0.12, 0, Math.PI*2);
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.fill();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+
+            // Bintang
+            stars.forEach(s => {
+                s.x += s.speed;
+                if (s.x < 0) s.x = width;
+                if (s.x > width) s.x = 0;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.size, 0, Math.PI*2);
+                ctx.fillStyle = 'white';
+                ctx.fill();
+            });
+
+            // Planet
+            planets.forEach(p => {
+                p.angle += p.speed;
+                const x = p.centerX + Math.cos(p.angle) * p.dist;
+                const y = p.centerY + Math.sin(p.angle) * p.dist;
+                drawPlanet(x, y, p.radius, p.color);
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+        animate();
+
+        // Kursor
+        const cursor = document.getElementById('customCursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+    </script>
+</body>
+</html>
